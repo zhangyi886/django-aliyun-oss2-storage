@@ -171,11 +171,13 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         files = []
         dirs = set()
 
-        for obj in ObjectIterator(self.bucket, prefix=name, delimiter='/'):
+        # for obj in ObjectIterator(self.bucket, prefix=name, delimiter='/'):
+        for obj in ObjectIterator(self.bucket, prefix=name):
             if obj.is_prefix():
                 dirs.add(obj.key)
             else:
-                files.append(obj.key)
+                # files.append(obj.key)
+                files.append(obj.key[len(name)+ 1:])
 
         return list(dirs), files
 
@@ -207,7 +209,8 @@ class AliyunStaticStorage(AliyunBaseStorage):
 class AliyunFile(File):
     def __init__(self, name, storage, mode):
         self._storage = storage
-        self._name = name[len(self._storage.location):]
+        # self._name = name[len(self._storage.location):]
+        self._name = self._storage.location[1:] + name
         self._mode = mode
         self.file = six.BytesIO()
         self._is_dirty = False
